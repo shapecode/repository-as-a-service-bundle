@@ -1,0 +1,11 @@
+parameters:
+    shapecode_raas.doctrine.repository_factory.default.class: Doctrine\ORM\Repository\DefaultRepositoryFactory
+    shapecode_raa.doctrines.repository_factory.class: Shapecode\Bundle\RasSBundle\Doctrine\Repository\ServiceRepositoryFactory
+
+services:
+    shapecode_raas.doctrine.repository_factory:
+        class: %shapecode_raa.doctrines.repository_factory.class%
+        arguments: [@service_container, @shapecode_raas.doctrine.repository_factory.default]
+
+    shapecode_raas.doctrine.repository_factory.default:
+        class: %shapecode_raas.doctrine.repository_factory.default.class%
