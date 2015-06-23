@@ -3,7 +3,7 @@ Symfony - Repository as a Service (RaaS)
 
 This bundle allows to register repositories as a service.
 
-Tested only against Symfony 2.6.
+Tested only against Symfony 2.7.
 
 Install instructions
 --------------------------------
