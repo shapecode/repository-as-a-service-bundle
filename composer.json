@@ -35,5 +35,10 @@
         "psr-4": {
             "Shapecode\\Bundle\\RasSBundle\\": ""
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "1.0-dev"
+        }
     }
 }
