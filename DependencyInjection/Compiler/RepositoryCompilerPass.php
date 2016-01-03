@@ -35,24 +35,28 @@ class RepositoryCompilerPass implements CompilerPassInterface
                 // add service to list
                 $repositories[$param['class']] = $id;
 
+                $className = $param['class'];
+                $entityManagerServiceId = (isset($param['em'])) ? $param['em'] : 'doctrine.orm.default_entity_manager';
+                $entityManagerReference = new Reference($entityManagerServiceId);
+                $metaDataClassName = (isset($param['meta_class_name'])) ? $param['meta_class_name'] : 'Doctrine\ORM\Mapping\ClassMetadata';
+
                 // get definition of service
                 $repository = $container->findDefinition($id);
 
-
                 // new class metadata definition
                 $definition = new Definition();
-                $definition->setClass('Doctrine\ORM\Mapping\ClassMetadata');
-                $definition->setFactory(array(new Reference('doctrine.orm.default_entity_manager'), 'getClassMetadata'));
-                $definition->setArguments(array($param['class']));
+                $definition->setClass($metaDataClassName);
+                $definition->setFactory(array($entityManagerReference, 'getClassMetadata'));
+                $definition->setArguments(array($className));
 
                 // set new arguments
                 $repository->setArguments(array(
-                    new Reference('doctrine.orm.default_entity_manager'),
+                    $entityManagerReference,
                     $definition
                 ));
 
                 // set alias
-                if(isset($param['alias'])) {
+                if (isset($param['alias'])) {
                     $container->addAliases(array(
                         $param['alias'] => $id
                     ));
