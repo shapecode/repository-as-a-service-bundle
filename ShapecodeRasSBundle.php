@@ -15,7 +15,7 @@ class ShapecodeRasSBundle extends Bundle
 {
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function build(ContainerBuilder $container)
     {

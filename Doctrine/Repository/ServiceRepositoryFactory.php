@@ -57,7 +57,7 @@ class ServiceRepositoryFactory implements RepositoryFactory
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getRepository(EntityManagerInterface $entityManager, $entityName)
     {

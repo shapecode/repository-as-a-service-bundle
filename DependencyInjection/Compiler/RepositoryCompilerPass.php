@@ -17,7 +17,7 @@ class RepositoryCompilerPass implements CompilerPassInterface
 {
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function process(ContainerBuilder $container)
     {
