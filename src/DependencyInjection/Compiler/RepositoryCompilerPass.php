@@ -3,6 +3,7 @@
 namespace Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -34,7 +35,7 @@ class RepositoryCompilerPass implements CompilerPassInterface
         // custom factory
         $factory = $container->findDefinition('shapecode_raas.doctrine.repository_factory');
 
-        $repositories = array();
+        $repositories = [];
 
         // find all doctrine repository services they are tagged
         $services = $container->findTaggedServiceIds('doctrine.repository');
@@ -56,29 +57,29 @@ class RepositoryCompilerPass implements CompilerPassInterface
                 // new class metadata definition
                 $definition = new Definition();
                 $definition->setClass($metaDataClassName);
-                $definition->setFactory(array($entityManagerReference, 'getClassMetadata'));
-                $definition->setArguments(array($className));
+                $definition->setFactory([$entityManagerReference, 'getClassMetadata']);
+                $definition->setArguments([$className]);
 
                 // set new arguments
-                $repository->setArguments(array(
+                $repository->setArguments([
                     $entityManagerReference,
                     $definition
-                ));
+                ]);
 
                 // set alias
                 if (isset($param['alias'])) {
-                    $container->addAliases(array(
+                    $container->addAliases([
                         $param['alias'] => $id
-                    ));
+                    ]);
                 }
             }
         }
 
         // add services to factory ;)
-        $factory->addMethodCall('addServices', array($repositories));
+        $factory->addMethodCall('addServices', [$repositories]);
 
         // replace default repository factory
-        $container->findDefinition('doctrine.orm.configuration')->addMethodCall('setRepositoryFactory', array($factory));
+        $container->findDefinition('doctrine.orm.configuration')->addMethodCall('setRepositoryFactory', [$factory]);
     }
 
     /**
@@ -99,7 +100,7 @@ class RepositoryCompilerPass implements CompilerPassInterface
 
             $name = $this->generateServiceName($reflectionClass);
             $aliasName = $this->generateAliasName($reflectionClass);
-            $repositoryName = 'Doctrine\ORM\EntityRepository';
+            $repositoryName = EntityRepository::class;
 
             if ($m->customRepositoryClassName) {
                 $repositoryName = $m->customRepositoryClassName;
@@ -108,7 +109,7 @@ class RepositoryCompilerPass implements CompilerPassInterface
             if (!$container->has($name)) {
                 $definition = new Definition($repositoryName);
                 $definition->setFactory([
-                    new Reference('doctrine.orm.entity_manager'),
+                    new Reference('doctrine.orm.default_entity_manager'),
                     'getRepository'
                 ]);
                 $definition->addArgument($m->getName());
