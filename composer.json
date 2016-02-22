@@ -1,6 +1,6 @@
 {
     "name": "shapecode/repository-as-a-service",
-    "description": "",
+    "description": "Symfony2 Bundle which you can register repositories easily.",
     "keywords": [
         "shapecode",
         "repository",
@@ -33,7 +33,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Shapecode\\Bundle\\RasSBundle\\": ""
+            "Shapecode\\Bundle\\RasSBundle\\": "src/",
+            "Shapecode\\Bundle\\RasSBundle\\Tests\\": "tests/"
         }
     },
     "extra": {

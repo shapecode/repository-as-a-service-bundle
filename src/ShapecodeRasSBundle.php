@@ -3,6 +3,7 @@
 namespace Shapecode\Bundle\RasSBundle;
 
 use Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler\RepositoryCompilerPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -21,6 +22,6 @@ class ShapecodeRasSBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new RepositoryCompilerPass());
+        $container->addCompilerPass(new RepositoryCompilerPass(), PassConfig::TYPE_OPTIMIZE);
     }
 }
