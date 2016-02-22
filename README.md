@@ -3,8 +3,6 @@ Symfony - Repository as a Service (RaaS)
 
 This bundle allows to register repositories as a service.
 
-Tested only against Symfony 2.7.
-
 Install instructions
 --------------------------------
 
@@ -18,7 +16,7 @@ Add the bundle to your project as a composer dependency:
     // ...
     require: {
         // ...
-        "shapecode/repository-as-a-service": "~1.0"
+        "shapecode/repository-as-a-service": "~1.2"
     }
 }
 ```
@@ -57,14 +55,22 @@ app.repository.example:
         -  { name: doctrine.repository, class: %app.entity.example.class%, alias: example_repository }
 ```
 
-Ready
+or let the bundle do the job for you. It creates automatically services for you. Just access it with "lowercaseentitnyname_repository".
+ 
+```
+#!php
+<?php
 
-Update instructions
----------------------------
-
-Do a [composer](https://getcomposer.org/doc/00-intro.md) update.
+$this->getContainer()->get('lowercaseentitnyname_repository');
+```
+ 
+The old way to get repository is also supported. If you get them like this ...
 
 ```
-#!bash
-$ composer update
+#!php
+<?php
+
+$this->getRepository('ShapecodeRasSBundle:TestEntity');
 ```
+
+... you get the service off the repository instead.
