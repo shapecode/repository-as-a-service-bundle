@@ -57,6 +57,7 @@ app.repository.example:
 
 or let the bundle do the job for you. It creates automatically services for you. Just access it with "lowercaseentitnyname_repository".
  
+```
 #!php
 <?php
 
@@ -65,6 +66,7 @@ $this->getContainer()->get('lowercaseentitnyname_repository');
  
 The old way to get repository is also supported. If you get them like this ...
 
+```
 #!php
 <?php
 
