@@ -2,6 +2,7 @@ Symfony - Repository as a Service (RaaS)
 =======================
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/45d25f2d-0f87-43f7-ba74-b239562c41e1/mini.png)](https://insight.sensiolabs.com/projects/45d25f2d-0f87-43f7-ba74-b239562c41e1)
+[![Dependency Status](https://www.versioneye.com/user/projects/57703b696718940052ba8cc2/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57703b696718940052ba8cc2)
 [![Latest Stable Version](https://poser.pugx.org/shapecode/repository-as-a-service/v/stable)](https://packagist.org/packages/shapecode/repository-as-a-service)
 [![Total Downloads](https://poser.pugx.org/shapecode/repository-as-a-service/downloads)](https://packagist.org/packages/shapecode/repository-as-a-service)
 [![License](https://poser.pugx.org/shapecode/repository-as-a-service/license)](https://packagist.org/packages/shapecode/repository-as-a-service)
