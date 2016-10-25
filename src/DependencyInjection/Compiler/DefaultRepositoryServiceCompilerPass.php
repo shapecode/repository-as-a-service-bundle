@@ -73,13 +73,21 @@ class DefaultRepositoryServiceCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param \ReflectionClass $class
+     * @param \ReflectionClass $classReflection
      *
      * @return string
      */
-    protected function generateServiceName(\ReflectionClass $class)
+    protected function generateServiceName(\ReflectionClass $classReflection)
     {
-        return strtolower(str_replace(['Entity\\', '\\'], ['', '.'], $class->getName())) . '.repository';
+        $namespace = $classReflection->getNamespaceName();
+        $className = $classReflection->getShortName();
+        $className = preg_split('/(?=[A-Z])/', $className);
+        $className = array_filter($className, function ($el) {
+            return !empty($el);
+        });
+        $className = strtolower(implode('_', $className));
+
+        return strtolower(str_replace(['Entity\\', '\\'], ['', '.'], $namespace)) . '.' . $className . '.repository';
     }
 
     /**
