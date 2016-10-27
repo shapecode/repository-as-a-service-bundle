@@ -63,12 +63,16 @@ class DeclaredRepositoryServiceCompilerPass implements CompilerPassInterface
                     $definition
                 ]);
 
-                // set alias
-                if (isset($param['alias'])) {
-                    $container->addAliases([
-                        $param['alias'] => $id
-                    ]);
+                if (!$container->hasAlias($param['alias'])) {
+                    $container->setAlias($param['alias'], $id);
                 }
+
+//                // set alias
+//                if (isset($param['alias'])) {
+//                    $container->addAliases([
+//                        $param['alias'] => $id
+//                    ]);
+//                }
             }
         }
 
