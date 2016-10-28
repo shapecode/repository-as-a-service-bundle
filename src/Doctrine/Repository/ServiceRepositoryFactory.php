@@ -8,9 +8,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class ServiceRepositoryFactory
+ *
  * @package Shapecode\Bundle\RasSBundle\Doctrine\Repository
- * @author Nikita Loges
- * @date 01.04.2015
+ * @author  Nikita Loges
+ * @date    01.04.2015
  */
 class ServiceRepositoryFactory implements RepositoryFactory
 {
@@ -26,7 +27,7 @@ class ServiceRepositoryFactory implements RepositoryFactory
 
     /**
      * @param ContainerInterface $container
-     * @param RepositoryFactory $default
+     * @param RepositoryFactory  $default
      */
     public function __construct(ContainerInterface $container, RepositoryFactory $default)
     {
@@ -47,6 +48,7 @@ class ServiceRepositoryFactory implements RepositoryFactory
     /**
      * @param $entityName
      * @param $service
+     *
      * @return mixed
      */
     public function addService($entityName, $service)
@@ -57,12 +59,35 @@ class ServiceRepositoryFactory implements RepositoryFactory
     }
 
     /**
+     * @param $className
+     *
+     * @return bool
+     */
+    public function hasService($className)
+    {
+        return (isset($this->ids[$className]));
+    }
+
+    /**
+     * @param $className
+     *
+     * @return mixed
+     */
+    public function getService($className)
+    {
+        return $this->ids[$className];
+    }
+
+    /**
      * @inheritdoc
      */
     public function getRepository(EntityManagerInterface $entityManager, $entityName)
     {
-        if (isset($this->ids[$entityName])) {
-            return $this->container->get($this->ids[$entityName]);
+        $reflection = $entityManager->getClassMetadata($entityName)->getReflectionClass();
+        $className = $reflection->getName();
+
+        if ($this->hasService($className)) {
+            return $this->container->get($this->getService($className));
         }
 
         return $this->default->getRepository($entityManager, $entityName);

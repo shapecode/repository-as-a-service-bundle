@@ -39,10 +39,15 @@ class DefaultRepositoryServiceCompilerPass implements CompilerPassInterface
 
         $em = $container->get('doctrine.orm.default_entity_manager');
 
+        // custom factory
+        $factory = $container->findDefinition('shapecode_raas.doctrine.repository_factory');
+
+        $repositories = [];
+
         /** @var array|ClassMetadata[] $metadata */
         $metadata = $em->getMetadataFactory()->getAllMetadata();
         foreach ($metadata as $m) {
-            $name = $this->generateServiceName($em, $m);
+            $id = $this->generateServiceName($em, $m);
 
             $repositoryName = EntityRepository::class;
 
@@ -50,30 +55,37 @@ class DefaultRepositoryServiceCompilerPass implements CompilerPassInterface
                 $repositoryName = $m->customRepositoryClassName;
             }
 
-            if (!$container->has($name)) {
+            if (!$container->has($id)) {
                 $definition = new Definition($repositoryName);
                 $definition->setFactory([
-                    new Reference('doctrine.orm.default_entity_manager'),
+                    new Reference('shapecode_raas.doctrine.repository_factory.default'),
                     'getRepository'
                 ]);
+                $definition->addArgument(new Reference('doctrine.orm.default_entity_manager'));
                 $definition->addArgument($m->getName());
-                $container->setDefinition($name, $definition);
+                $container->setDefinition($id, $definition);
             }
+
+            // add service to list
+            $repositories[$m->getReflectionClass()->getName()] = $id;
 
             $aliasParts = $this->getAliasParts($em, $m);
             $aliasName = strtolower(implode('', $aliasParts)).'_repository';
             $aliasNameUnderscore = strtolower(implode('_', $aliasParts)).'_repository';
 
             if (!$container->hasAlias($aliasName)) {
-                $container->setAlias($aliasName, $name);
+                $container->setAlias($aliasName, $id);
             }
 
             if ($aliasNameUnderscore != $aliasName) {
                 if (!$container->hasAlias($aliasNameUnderscore)) {
-                    $container->setAlias($aliasNameUnderscore, $name);
+                    $container->setAlias($aliasNameUnderscore, $id);
                 }
             }
         }
+
+        // add services to factory ;)
+        $factory->addMethodCall('addServices', [$repositories]);
     }
 
     /**
