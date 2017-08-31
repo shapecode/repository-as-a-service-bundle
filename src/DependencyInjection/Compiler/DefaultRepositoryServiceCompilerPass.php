@@ -4,6 +4,7 @@ namespace Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Shapecode\Bundle\RasSBundle\DependencyInjection\ServiceNameGenerator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -38,81 +39,50 @@ class DefaultRepositoryServiceCompilerPass implements CompilerPassInterface
 
         $em = $container->get('doctrine.orm.default_entity_manager');
 
+        // custom factory
+        $factory = $container->findDefinition('shapecode_raas.doctrine.repository_factory');
+
+        $repositories = [];
+
+        $nameGenerator = new ServiceNameGenerator();
+
         /** @var array|ClassMetadata[] $metadata */
         $metadata = $em->getMetadataFactory()->getAllMetadata();
         foreach ($metadata as $m) {
-            $reflectionClass = $m->getReflectionClass();
+            $id = $nameGenerator->getServiceName($em, $m);
 
-            $name = $this->generateServiceName($reflectionClass);
-            $aliasName = $this->generateAliasName($reflectionClass);
-            $aliasNameUnderscore = $this->generateAliasNameUnderscore($reflectionClass);
             $repositoryName = EntityRepository::class;
 
             if ($m->customRepositoryClassName) {
                 $repositoryName = $m->customRepositoryClassName;
             }
 
-            if (!$container->has($name)) {
+            $className = $m->getReflectionClass()->getName();
+
+            $alias = $nameGenerator->getAliasName($className);
+
+            if ($container->has($alias) || $container->hasAlias($alias)) {
+                continue;
+            }
+
+            if (!$container->has($id)) {
                 $definition = new Definition($repositoryName);
                 $definition->setFactory([
-                    new Reference('doctrine.orm.default_entity_manager'),
+                    new Reference('shapecode_raas.doctrine.repository_factory.default'),
                     'getRepository'
                 ]);
+                $definition->addArgument(new Reference('doctrine.orm.default_entity_manager'));
                 $definition->addArgument($m->getName());
-                $container->setDefinition($name, $definition);
+                $container->setDefinition($id, $definition);
             }
 
-            if (!$container->hasAlias($aliasName)) {
-                $container->setAlias($aliasName, $name);
-            }
+            // add service to list
+            $repositories[$className] = $id;
 
-            if (!$container->hasAlias($aliasNameUnderscore)) {
-                $container->setAlias($aliasNameUnderscore, $name);
-            }
+            $container->setAlias($alias, $id);
         }
-    }
 
-    /**
-     * @param \ReflectionClass $classReflection
-     *
-     * @return string
-     */
-    protected function generateServiceName(\ReflectionClass $classReflection)
-    {
-        $namespace = $classReflection->getNamespaceName();
-        $className = $classReflection->getShortName();
-        $className = preg_split('/(?=[A-Z])/', $className);
-        $className = array_filter($className, function ($el) {
-            return !empty($el);
-        });
-        $className = strtolower(implode('_', $className));
-
-        return strtolower(str_replace(['Entity\\', '\\'], ['', '.'], $namespace)) . '.' . $className . '.repository';
-    }
-
-    /**
-     * @param \ReflectionClass $class
-     *
-     * @return string
-     */
-    protected function generateAliasName(\ReflectionClass $class)
-    {
-        return strtolower($class->getShortName()) . '_repository';
-    }
-
-    /**
-     * @param \ReflectionClass $class
-     *
-     * @return string
-     */
-    protected function generateAliasNameUnderscore(\ReflectionClass $class)
-    {
-        $name = $class->getShortName();
-        $name = preg_split('/(?=[A-Z])/', $name);
-        $name = array_filter($name, function ($el) {
-            return !empty($el);
-        });
-
-        return strtolower(implode('_', $name)) . '_repository';
+        // add services to factory ;)
+        $factory->addMethodCall('addServices', [$repositories]);
     }
 }

@@ -4,14 +4,16 @@ namespace Shapecode\Bundle\RasSBundle;
 
 use Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler\DeclaredRepositoryServiceCompilerPass;
 use Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler\DefaultRepositoryServiceCompilerPass;
+use Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler\RepositoryFactoryCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Class ShapecodeRasSBundle
+ *
  * @package Shapecode\Bundle\RasSBundle
- * @author Nikita Loges
+ * @author  Nikita Loges
  */
 class ShapecodeRasSBundle extends Bundle
 {
@@ -23,7 +25,8 @@ class ShapecodeRasSBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new DeclaredRepositoryServiceCompilerPass());
-        $container->addCompilerPass(new DefaultRepositoryServiceCompilerPass(), PassConfig::TYPE_OPTIMIZE);
+        $container->addCompilerPass(new RepositoryFactoryCompilerPass());
+        $container->addCompilerPass(new DeclaredRepositoryServiceCompilerPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new DefaultRepositoryServiceCompilerPass(), PassConfig::TYPE_REMOVE);
     }
 }
