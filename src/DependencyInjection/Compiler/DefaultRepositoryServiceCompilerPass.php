@@ -2,9 +2,9 @@
 
 namespace Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Shapecode\Bundle\RasSBundle\DependencyInjection\ServiceNameGenerator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -44,15 +44,25 @@ class DefaultRepositoryServiceCompilerPass implements CompilerPassInterface
 
         $repositories = [];
 
+        $nameGenerator = new ServiceNameGenerator();
+
         /** @var array|ClassMetadata[] $metadata */
         $metadata = $em->getMetadataFactory()->getAllMetadata();
         foreach ($metadata as $m) {
-            $id = $this->generateServiceName($em, $m);
+            $id = $nameGenerator->getServiceName($em, $m);
 
             $repositoryName = EntityRepository::class;
 
             if ($m->customRepositoryClassName) {
                 $repositoryName = $m->customRepositoryClassName;
+            }
+
+            $className = $m->getReflectionClass()->getName();
+
+            $alias = $nameGenerator->getAliasName($className);
+
+            if ($container->has($alias) || $container->hasAlias($alias)) {
+                continue;
             }
 
             if (!$container->has($id)) {
@@ -67,121 +77,12 @@ class DefaultRepositoryServiceCompilerPass implements CompilerPassInterface
             }
 
             // add service to list
-            $repositories[$m->getReflectionClass()->getName()] = $id;
+            $repositories[$className] = $id;
 
-            $aliasParts = $this->getAliasParts($em, $m);
-            $aliasName = strtolower(implode('', $aliasParts)).'_repository';
-            $aliasNameUnderscore = strtolower(implode('_', $aliasParts)).'_repository';
-
-            if (!$container->hasAlias($aliasName)) {
-                $container->setAlias($aliasName, $id);
-            }
-
-            if ($aliasNameUnderscore != $aliasName) {
-                if (!$container->hasAlias($aliasNameUnderscore)) {
-                    $container->setAlias($aliasNameUnderscore, $id);
-                }
-            }
+            $container->setAlias($alias, $id);
         }
 
         // add services to factory ;)
         $factory->addMethodCall('addServices', [$repositories]);
-    }
-
-    /**
-     * @param EntityManagerInterface $em
-     * @param ClassMetadata          $m
-     *
-     * @return string
-     */
-    protected function generateServiceName(EntityManagerInterface $em, ClassMetadata $m)
-    {
-        $classReflection = $m->getReflectionClass();
-        $classNamespace = $classReflection->getNamespaceName();
-
-        $aliasData = $this->getNamespaceAlias($em, $classNamespace);
-        $namespace = $aliasData['namespace'];
-        $namespaceAlias = $aliasData['alias'];
-
-        $namespaceBlacklist = [
-            'entity',
-            'entities',
-            'bundle',
-        ];
-
-        $className = $classReflection->getName();
-        $className = str_replace($namespace, '', $className);
-        $className = str_replace('\\', '', $className);
-        $className = preg_split('/(?=[A-Z])/', $className);
-        $className = array_filter($className, function ($el) {
-            return !empty($el);
-        });
-        $className = strtolower(implode('_', $className));
-
-        $namespaceAlias = preg_split('/(?=[A-Z])/', $namespaceAlias);
-        $namespaceAlias = array_map(function ($el) {
-            return strtolower($el);
-        }, $namespaceAlias);
-        $namespaceAlias = array_filter($namespaceAlias, function ($el) use ($namespaceBlacklist) {
-            if (empty($el)) {
-                return false;
-            }
-
-            if (in_array($el, $namespaceBlacklist)) {
-                return false;
-            }
-
-            return true;
-        });
-        $namespaceAlias = strtolower(implode('_', $namespaceAlias));
-
-        $serviceName = $namespaceAlias . '.repository.' . $className;
-
-        return $serviceName;
-    }
-
-    /**
-     * @param EntityManagerInterface $em
-     * @param ClassMetadata          $m
-     *
-     * @return array|mixed|string
-     */
-    protected function getAliasParts(EntityManagerInterface $em, ClassMetadata $m)
-    {
-
-        $class = $m->getReflectionClass();
-        $classNamespace = $class->getNamespaceName();
-
-        $aliasData = $this->getNamespaceAlias($em, $classNamespace);
-
-        $className = $class->getName();
-        $className = str_replace([$aliasData['namespace'], '\\'], '', $className);
-        $className = preg_split('/(?=[A-Z])/', $className);
-        $className = array_filter($className, function ($el) {
-            return !empty($el);
-        });
-
-        return $className;
-    }
-
-    /**
-     * @param EntityManagerInterface $em
-     * @param                        $baseNamespace
-     *
-     * @return array
-     */
-    protected function getNamespaceAlias(EntityManagerInterface $em, $baseNamespace)
-    {
-        $namespaces = $em->getConfiguration()->getEntityNamespaces();
-
-        $namespace = null;
-        foreach ($namespaces as $alias => $namespace) {
-            if (mb_substr($baseNamespace, 0, mb_strlen($namespace)) === $namespace) {
-                return [
-                    'namespace' => $namespace,
-                    'alias'     => $alias
-                ];
-            }
-        }
     }
 }
