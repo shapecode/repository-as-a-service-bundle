@@ -13,7 +13,6 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @package Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler
  * @author  Nikita Loges
- * @date    01.04.2015
  */
 class DeclaredRepositoryServiceCompilerPass implements CompilerPassInterface
 {

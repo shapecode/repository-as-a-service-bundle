@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
  *
  * @package Shapecode\Bundle\RasSBundle\DependencyInjection
  * @author  Nikita Loges
- * @company tenolo GbR
  */
 class ServiceNameGenerator
 {

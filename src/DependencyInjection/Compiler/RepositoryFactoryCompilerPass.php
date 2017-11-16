@@ -10,7 +10,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @package Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler
  * @author  Nikita Loges
- * @company tenolo GbR
  */
 class RepositoryFactoryCompilerPass implements CompilerPassInterface
 {

@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @package Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler
  * @author  Nikita Loges
- * @company tenolo GbR
  */
 class DefaultRepositoryServiceCompilerPass implements CompilerPassInterface
 {
