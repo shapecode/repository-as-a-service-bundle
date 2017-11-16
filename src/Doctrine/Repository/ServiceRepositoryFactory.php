@@ -11,7 +11,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @package Shapecode\Bundle\RasSBundle\Doctrine\Repository
  * @author  Nikita Loges
- * @date    01.04.2015
  */
 class ServiceRepositoryFactory implements RepositoryFactory
 {
