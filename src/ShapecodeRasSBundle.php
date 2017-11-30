@@ -3,7 +3,6 @@
 namespace Shapecode\Bundle\RasSBundle;
 
 use Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler\DeclaredRepositoryServiceCompilerPass;
-use Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler\DefaultRepositoryServiceCompilerPass;
 use Shapecode\Bundle\RasSBundle\DependencyInjection\Compiler\RepositoryFactoryCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,6 +26,5 @@ class ShapecodeRasSBundle extends Bundle
 
         $container->addCompilerPass(new RepositoryFactoryCompilerPass());
         $container->addCompilerPass(new DeclaredRepositoryServiceCompilerPass(), PassConfig::TYPE_BEFORE_REMOVING);
-        $container->addCompilerPass(new DefaultRepositoryServiceCompilerPass(), PassConfig::TYPE_REMOVE);
     }
 }
