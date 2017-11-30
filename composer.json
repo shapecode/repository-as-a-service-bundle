@@ -34,6 +34,7 @@
         "symfony/config": "~2.8|~3.0",
         "symfony/doctrine-bridge": "~2.8|~3.0",
 
+        "doctrine/doctrine-bundle": "~1.6",
         "doctrine/orm": "~2.5"
     },
     "require-dev": {
